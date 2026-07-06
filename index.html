@@ -3,1362 +3,543 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ace Bikes — Store Management</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Ace Bikes — Enjoy the Ride</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --sidebar-bg: #111827;
-    --sidebar-width: 248px;
-    --accent: #f97316;
-    --accent-light: #fff7ed;
-    --accent-dark: #c2410c;
-    --accent-mid: #fb923c;
-    --surface: #ffffff;
-    --surface-2: #f9fafb;
-    --surface-3: #f3f4f6;
-    --border: #e5e7eb;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-tertiary: #9ca3af;
-    --danger: #ef4444;
-    --danger-light: #fee2e2;
-    --warning: #f59e0b;
-    --warning-light: #fef3c7;
-    --info: #3b82f6;
-    --info-light: #dbeafe;
-    --success: #10b981;
-    --success-light: #d1fae5;
-    --radius: 8px;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --teal-deep: #0F4557;
+    --teal-darker: #0A2E39;
+    --teal-bright: #3FBFB8;
+    --cream: #FCEFDD;
+    --cream-deep: #F3DCC0;
+    --white: #FFFFFF;
+    --ink: #1B2E33;
+    --line: #D8C9B4;
+    --mono-bg: #0A2E39;
+    --mono-text: #CDEDE9;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background: var(--surface-2);
-    color: var(--text-primary);
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    background: var(--white);
+    line-height: 1.6;
   }
-
-  /* SIDEBAR */
-  .sidebar {
-    width: var(--sidebar-width);
-    background: var(--sidebar-bg);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    padding: 0 0 16px;
-    overflow-y: auto;
-  }
-
-  .sidebar-logo {
-    padding: 22px 20px 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    margin-bottom: 8px;
-  }
-
-  .logo-mark {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-  }
-
-  .logo-icon {
-    width: 36px;
-    height: 36px;
-    background: var(--accent);
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .logo-text {
-    font-family: 'Outfit', sans-serif;
-    font-size: 19px;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.5px;
-    line-height: 1;
-  }
-
-  .logo-sub {
-    font-size: 10px;
-    color: rgba(255,255,255,0.3);
-    margin-top: 3px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-  }
-
-  .sidebar-section {
-    padding: 8px 12px 4px;
-  }
-
-  .sidebar-section-label {
-    font-size: 10px;
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', serif;
     font-weight: 600;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.2);
-    padding: 0 8px;
-    margin-bottom: 4px;
+    line-height: 1.1;
+    margin: 0;
   }
+  a { color: inherit; }
+  img { max-width: 100%; display: block; }
 
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: rgba(255,255,255,0.5);
-    font-size: 13.5px;
-    font-weight: 400;
-    user-select: none;
-  }
-
-  .nav-item:hover {
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.85);
-  }
-
-  .nav-item.active {
-    background: rgba(249,115,22,0.18);
-    color: #fb923c;
-  }
-
-  .nav-item .nav-icon {
-    font-size: 15px;
-    width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .sidebar-footer {
-    margin-top: auto;
-    padding: 16px 20px 0;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .store-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .store-avatar {
-    width: 30px;
-    height: 30px;
-    background: linear-gradient(135deg, #f97316, #ef4444);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: white;
-    font-weight: 700;
-  }
-
-  .store-info { flex: 1; min-width: 0; }
-  .store-name { font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500; }
-  .store-role { font-size: 11px; color: rgba(255,255,255,0.3); }
-
-  /* MAIN */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .topbar {
-    height: 56px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 28px;
-    gap: 14px;
-    flex-shrink: 0;
-  }
-
-  .topbar-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
-  }
-
-  .topbar-divider {
-    width: 1px;
-    height: 16px;
-    background: var(--border);
-  }
-
-  .topbar-sub {
-    font-size: 13px;
-    color: var(--text-tertiary);
-  }
-
-  .topbar-right {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .topbar-date {
-    font-size: 12px;
-    color: var(--text-tertiary);
-    background: var(--surface-3);
-    padding: 4px 10px;
-    border-radius: 20px;
-  }
-
-  .content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 28px;
-  }
-
-  .page { display: none; }
-  .page.active { display: block; }
-
-  /* STATS */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .stat-card:hover::before { opacity: 1; }
-
-  .stat-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    margin-bottom: 10px;
-  }
-
-  .stat-value {
-    font-family: 'Outfit', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1;
-    margin-bottom: 8px;
-    letter-spacing: -1px;
-  }
-
-  .stat-delta {
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .stat-delta.up { color: var(--success); }
-  .stat-delta.down { color: var(--danger); }
-  .stat-delta.neutral { color: var(--text-tertiary); }
-
-  /* CHARTS */
-  .charts-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .card-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
+  /* ---------- Nav ---------- */
+  .nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 20px 6vw;
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 20;
   }
-
-  .card-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.2px;
-  }
-
-  .card-sub {
-    font-size: 11px;
-    color: var(--text-tertiary);
-    margin-top: 2px;
-  }
-
-  .card-body { padding: 20px; }
-
-  /* TABLES */
-  .table-toolbar {
+  .nav-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
-  .search-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 8px 12px;
-    flex: 1;
-    max-width: 300px;
-    transition: border-color 0.15s;
-  }
-
-  .search-box:focus-within { border-color: var(--accent); }
-
-  .search-box input {
-    border: none;
-    outline: none;
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 13px;
-    color: var(--text-primary);
-    background: transparent;
-    width: 100%;
-  }
-
-  .search-box input::placeholder { color: var(--text-tertiary); }
-
-  .filter-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 13px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 12.5px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .filter-btn:hover { background: var(--surface-3); border-color: #d1d5db; }
-
-  .record-count { margin-left: auto; font-size: 12px; color: var(--text-tertiary); }
-
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  .data-table thead th {
-    text-align: left;
-    padding: 9px 14px;
-    font-size: 10.5px;
+    gap: 12px;
+    font-family: 'Fraunces', serif;
     font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--teal-deep);
+    letter-spacing: 0.02em;
+  }
+  .nav-brand img { width: 40px; height: 40px; border-radius: 50%; }
+  .nav-links { display: flex; gap: 32px; font-size: 0.95rem; font-weight: 500; }
+  .nav-links a { text-decoration: none; color: var(--ink); opacity: 0.75; transition: opacity 0.2s; }
+  .nav-links a:hover { opacity: 1; }
+  .nav-links .data-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    background: var(--teal-darker);
+    color: var(--mono-text);
+    padding: 8px 14px;
+    border-radius: 4px;
+    opacity: 1;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+    padding: 7vw 6vw 5vw;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 4vw;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--text-tertiary);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
-    white-space: nowrap;
+    color: var(--teal-bright);
+    background: var(--teal-darker);
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
   }
-
-  .data-table tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
+  .hero h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    color: var(--teal-deep);
+    margin-bottom: 20px;
   }
-
-  .data-table tbody tr:last-child { border-bottom: none; }
-  .data-table tbody tr:hover { background: #fffbf7; }
-
-  .data-table tbody td {
-    padding: 11px 14px;
-    color: var(--text-primary);
-    vertical-align: middle;
+  .hero p.lede {
+    font-size: 1.15rem;
+    max-width: 46ch;
+    color: var(--ink);
+    opacity: 0.85;
+    margin-bottom: 28px;
   }
-
-  .mono {
-    font-family: 'IBM Plex Mono', 'Courier New', monospace;
-    font-size: 12px;
-    color: var(--text-secondary);
-  }
-
-  .badge {
+  .hero-cta {
     display: inline-flex;
     align-items: center;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-  }
-
-  .badge-orange { background: #fff7ed; color: #c2410c; }
-  .badge-green { background: var(--success-light); color: #065f46; }
-  .badge-red { background: var(--danger-light); color: #b91c1c; }
-  .badge-yellow { background: var(--warning-light); color: #92400e; }
-  .badge-blue { background: var(--info-light); color: #1d4ed8; }
-  .badge-purple { background: #f5f3ff; color: #6d28d9; }
-  .badge-gray { background: var(--surface-3); color: var(--text-secondary); }
-  .badge-teal { background: #f0fdfa; color: #0f766e; }
-
-  .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    border-top: 1px solid var(--border);
-  }
-
-  .pagination-info { font-size: 12px; color: var(--text-tertiary); }
-  .pagination-btns { display: flex; gap: 3px; }
-
-  .page-btn {
-    min-width: 28px;
-    height: 28px;
-    padding: 0 6px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: var(--surface);
-    font-size: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    transition: all 0.15s;
-    font-family: 'IBM Plex Sans', sans-serif;
-  }
-
-  .page-btn:hover { background: var(--surface-3); }
-  .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
-
-  /* CATEGORY BARS */
-  .category-row {
-    display: flex;
-    align-items: center;
     gap: 10px;
-    margin-bottom: 13px;
-  }
-  .category-row:last-child { margin-bottom: 0; }
-  .category-name-col { font-size: 12.5px; font-weight: 500; min-width: 130px; }
-  .progress-bar { flex: 1; height: 6px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; }
-  .category-pct { font-size: 12px; font-weight: 600; color: var(--text-secondary); min-width: 32px; text-align: right; }
-
-  /* RECENT */
-  .recent-row {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    gap: 12px;
-  }
-  .recent-row:last-child { border-bottom: none; }
-
-  .customer-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .recent-info { flex: 1; min-width: 0; }
-  .recent-name { font-size: 13px; font-weight: 500; }
-  .recent-date { font-size: 11px; color: var(--text-tertiary); margin-top: 1px; }
-  .recent-amount { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-
-  /* DEVELOPER PAGE */
-  .dev-hero {
-    background: var(--sidebar-bg);
-    border-radius: var(--radius);
-    padding: 32px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .dev-hero::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 240px; height: 240px;
-    background: radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%);
-  }
-
-  .dev-hero::after {
-    content: '🚲';
-    position: absolute;
-    right: 32px; bottom: 16px;
-    font-size: 64px;
-    opacity: 0.07;
-  }
-
-  .dev-hero-label {
-    font-size: 10px;
+    background: var(--teal-deep);
+    color: var(--white);
+    padding: 14px 26px;
+    border-radius: 6px;
+    text-decoration: none;
     font-weight: 600;
-    letter-spacing: 1.5px;
+    font-size: 0.95rem;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .hero-cta:hover { background: var(--teal-darker); transform: translateY(-1px); }
+  .hero-badge-wrap {
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+  .hero-badge-wrap img {
+    width: min(340px, 100%);
+    filter: drop-shadow(0 18px 34px rgba(15,69,87,0.25));
+  }
+  .vision-quote {
+    margin-top: 44px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(15,69,87,0.2);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--teal-deep);
+    max-width: 50ch;
+  }
+
+  /* ---------- Coastline divider ---------- */
+  .coastline { display: block; width: 100%; height: auto; }
+
+  /* ---------- Section shell ---------- */
+  section.panel { padding: 5vw 6vw; min-width: 0; }
+  .section-head { margin-bottom: 36px; max-width: 60ch; }
+  .section-head .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--accent-mid);
+    color: var(--teal-bright);
+    display: block;
     margin-bottom: 10px;
   }
+  .section-head h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); color: var(--teal-deep); }
+  .section-head p { margin-top: 12px; opacity: 0.8; }
 
-  .dev-hero-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 26px;
-    font-weight: 800;
-    color: white;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
+  /* ---------- Category cards ---------- */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+  }
+  .cat-card {
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-width: 0;
+  }
+  .cat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(15,69,87,0.12); }
+  .cat-card h3 { font-size: 1.05rem; color: var(--teal-deep); margin-bottom: 6px; }
+  .cat-card span { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; opacity: 0.6; }
+
+  /* ---------- Product grid ---------- */
+  .prod-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 22px;
+  }
+  .prod-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--white);
+    min-width: 0;
+  }
+  .prod-swatch {
+    height: 110px;
+    background: linear-gradient(135deg, var(--teal-bright), var(--teal-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+  }
+  .prod-body { padding: 16px 18px 20px; }
+  .prod-body h4 { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+  .prod-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; color: var(--teal-deep); font-weight: 600; }
+  .prod-cat { font-size: 0.78rem; opacity: 0.6; margin-top: 4px; }
+
+  .loading-note, .empty-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    opacity: 0.6;
+    padding: 20px 0;
   }
 
-  .dev-hero-sub {
-    font-size: 13.5px;
-    color: rgba(255,255,255,0.45);
-    max-width: 500px;
-    line-height: 1.65;
-  }
-
-  .dev-grid {
+  /* ---------- Story ---------- */
+  .story {
+    background: var(--white);
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 5vw;
+    align-items: center;
+  }
+  .story-fact {
+    display: flex;
     gap: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 22px;
   }
-
-  .dev-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .dev-card-header {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .dev-card-icon {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-  }
-
-  .dev-card-icon.orange { background: var(--accent-light); }
-  .dev-card-icon.blue { background: var(--info-light); }
-  .dev-card-icon.yellow { background: var(--warning-light); }
-
-  .dev-card-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
+  .story-fact .yr {
+    font-family: 'Fraunces', serif;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--teal-bright);
+    font-size: 1.3rem;
+    min-width: 64px;
   }
+  .story-fact p { margin: 0; opacity: 0.85; }
 
-  .dev-card-body { padding: 18px; }
-
-  .endpoint-block {
-    background: #111827;
-    border-radius: 6px;
-    padding: 13px 15px;
-    margin-bottom: 10px;
-    position: relative;
+  /* ---------- Data zone ---------- */
+  .data-zone {
+    background: var(--teal-darker);
+    color: var(--mono-text);
+    padding: 5vw 6vw 6vw;
   }
-
-  .endpoint-label {
-    font-size: 10px;
+  .data-zone .section-head h2 { color: var(--white); }
+  .data-zone .section-head .eyebrow { color: var(--teal-bright); }
+  .data-zone .section-head p { color: var(--mono-text); opacity: 0.75; }
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 10px;
+    min-width: 0;
+  }
+  .data-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(205,237,233,0.18);
+    border-radius: 10px;
+    padding: 24px 26px;
+    min-width: 0;
+  }
+  .data-card h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--white);
+    margin-bottom: 14px;
     font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--accent-mid);
-    margin-bottom: 5px;
   }
-
-  .endpoint-url {
-    font-family: 'Courier New', monospace;
-    font-size: 11.5px;
-    color: #e5e7eb;
-    word-break: break-all;
-    line-height: 1.5;
-  }
-
-  .copy-btn {
-    position: absolute;
-    top: 10px; right: 10px;
-    background: rgba(255,255,255,0.08);
-    border: none;
-    border-radius: 4px;
-    color: rgba(255,255,255,0.5);
-    font-size: 11px;
-    padding: 3px 8px;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: 'IBM Plex Sans', sans-serif;
-  }
-
-  .copy-btn:hover { background: rgba(255,255,255,0.15); color: white; }
-
-  .steps-list { list-style: none; }
-
-  .steps-list li {
-    display: flex;
-    gap: 11px;
-    margin-bottom: 13px;
-    font-size: 13px;
-    color: var(--text-secondary);
+  .data-card p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 14px; }
+  pre {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
     line-height: 1.55;
+    color: #CDEDE9;
+    max-width: 100%;
+    min-width: 0;
   }
-
-  .steps-list li:last-child { margin-bottom: 0; }
-
-  .step-num {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    color: var(--accent-dark);
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  code {
-    font-size: 11px;
-    background: var(--surface-3);
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    color: var(--text-primary);
-  }
-
-  .schema-tabs {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .schema-tab {
-    padding: 7px 13px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-tertiary);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all 0.15s;
-  }
-
-  .schema-tab:hover { color: var(--text-secondary); }
-  .schema-tab.active { color: var(--accent-dark); border-bottom-color: var(--accent); }
-
-  .schema-panel { display: none; }
-  .schema-panel.active { display: block; }
-
-  .table-schema {
+  table.data-dict {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
-    font-size: 12.5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    display: block;
+    overflow-x: auto;
   }
-
-  .table-schema th {
+  table.data-dict th, table.data-dict td {
     text-align: left;
-    padding: 8px 12px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--text-tertiary);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(205,237,233,0.15);
   }
-
-  .table-schema td {
-    padding: 9px 12px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text-secondary);
-    vertical-align: middle;
-  }
-
-  .table-schema tr:last-child td { border-bottom: none; }
-
-  .field-name {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    color: var(--text-primary);
+  table.data-dict th { color: var(--teal-bright); font-weight: 600; }
+  .copy-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    background: var(--teal-bright);
+    color: var(--teal-darker);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    cursor: pointer;
     font-weight: 600;
+    margin-top: 4px;
+  }
+  .copy-btn:hover { opacity: 0.9; }
+
+  footer {
+    background: var(--teal-darker);
+    color: rgba(205,237,233,0.5);
+    text-align: center;
+    padding: 24px;
+    font-size: 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    border-top: 1px solid rgba(205,237,233,0.12);
   }
 
-  .key-badge {
-    display: inline-block;
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-badge-wrap { order: -1; }
+    .story { grid-template-columns: 1fr; }
+    .data-grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 16px; }
+    .nav-links span.hide-mobile { display: none; }
   }
 
-  .key-pk { background: #fef3c7; color: #92400e; }
-  .key-fk { background: #dbeafe; color: #1d4ed8; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .cat-card, .hero-cta { transition: none; }
+  }
 
-  .alert-banner {
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    border-radius: var(--radius);
-    padding: 11px 16px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 18px;
-    font-size: 13px;
-    color: #78350f;
-    line-height: 1.5;
+  :focus-visible {
+    outline: 3px solid var(--teal-bright);
+    outline-offset: 2px;
   }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark">
-      <div class="logo-icon">🚲</div>
-      <div>
-        <div class="logo-text">Ace Bikes</div>
-        <div class="logo-sub">Store Management</div>
-      </div>
-    </div>
+<nav class="nav">
+  <div class="nav-brand">
+    <img src="assets/ace-bikes-logo.png" alt="Ace Bikes logo">
+    Ace Bikes
   </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">Overview</div>
-    <div class="nav-item active" onclick="showPage('dashboard', this)">
-      <span class="nav-icon">⊞</span> Dashboard
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">Store Data</div>
-    <div class="nav-item" onclick="showPage('products', this)">
-      <span class="nav-icon">📦</span> Products
-    </div>
-    <div class="nav-item" onclick="showPage('customers', this)">
-      <span class="nav-icon">👥</span> Customers
-    </div>
-    <div class="nav-item" onclick="showPage('sales', this)">
-      <span class="nav-icon">🧾</span> Sales & Orders
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">Developer</div>
-    <div class="nav-item" onclick="showPage('devaccess', this)">
-      <span class="nav-icon">⚙</span> Database Access
-    </div>
-  </div>
-
-  <div class="sidebar-footer">
-    <div class="store-badge">
-      <div class="store-avatar">AB</div>
-      <div class="store-info">
-        <div class="store-name">Ace Bikes</div>
-        <div class="store-role">Store Manager</div>
-      </div>
-    </div>
+  <div class="nav-links">
+    <a href="#shop">Shop</a>
+    <a href="#story">Our Story</a>
+    <a href="#data" class="data-link">/ data &amp; learning</a>
   </div>
 </nav>
 
-<!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <div class="topbar-title" id="topbar-title">Dashboard</div>
-    <div class="topbar-divider"></div>
-    <div class="topbar-sub" id="topbar-sub">Store overview</div>
-    <div class="topbar-right">
-      <div class="topbar-date">📅 Last updated: Dec 15, 2024</div>
-    </div>
+<header class="hero">
+  <div>
+    <span class="hero-eyebrow">Est. 2017 · North Vancouver, BC</span>
+    <h1>Enjoy the Ride.</h1>
+    <p class="lede">We outfit the leisure bike enthusiast with everything needed for a safe and enjoyable ride — cruisers, gear, and the accessories that make every trip better.</p>
+    <a href="#shop" class="hero-cta">Browse the shop →</a>
+    <p class="vision-quote">"Empowering every individual to enjoy the ride."</p>
+  </div>
+  <div class="hero-badge-wrap">
+    <img src="assets/ace-bikes-logo.png" alt="Ace Bikes badge logo">
+  </div>
+</header>
+
+<svg class="coastline" viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="90" fill="#F3DCC0"/>
+  <polygon points="0,90 120,30 260,70 400,20 560,60 720,10 900,55 1080,25 1260,65 1440,35 1440,90" fill="#0F4557" opacity="0.9"/>
+  <path d="M0,68 C 180,45 320,85 500,60 C 680,35 860,75 1040,55 C 1220,35 1340,60 1440,50 L1440,90 L0,90 Z" fill="#3FBFB8" opacity="0.85"/>
+</svg>
+
+<section class="panel" id="shop">
+  <div class="section-head">
+    <span class="eyebrow">Shop by category</span>
+    <h2>Everything for the ride</h2>
+    <p>Live from our product catalog — six categories, from cruisers to the small parts that keep them running.</p>
+  </div>
+  <div class="cat-grid" id="cat-grid">
+    <div class="loading-note">Loading categories…</div>
+  </div>
+</section>
+
+<section class="panel" style="background: var(--cream);">
+  <div class="section-head">
+    <span class="eyebrow">Featured products</span>
+    <h2>Fresh off the floor</h2>
+    <p>A live look at what's currently in the catalog.</p>
+  </div>
+  <div class="prod-grid" id="prod-grid">
+    <div class="loading-note">Loading products…</div>
+  </div>
+</section>
+
+<section class="panel story" id="story">
+  <div>
+    <span class="hero-eyebrow" style="background:var(--cream-deep); color:var(--teal-deep);">Our story</span>
+    <h2 style="color:var(--teal-deep); font-size:2rem; margin-top:16px; margin-bottom:20px;">Two friends, one love of cruiser bikes.</h2>
+    <p style="opacity:0.85; max-width:48ch;">Lifelong friends Adam and Penelope turned a shared love of cruiser bikes into a business built on one idea: riding should be easy, comfortable, and fun. What started as a single storefront has grown into a name riders across British Columbia recognize.</p>
+  </div>
+  <div>
+    <div class="story-fact"><span class="yr">2017</span><p>Ace Bikes opens its first location in Lonsdale, North Vancouver — an instant hit with local cruiser riders.</p></div>
+    <div class="story-fact"><span class="yr">2020</span><p>Demand grows through the pandemic, and Ace Bikes launches its e-commerce shop to keep every rider outfitted.</p></div>
+    <div class="story-fact"><span class="yr">Today</span><p>Locations across the province, from Victoria to Kelowna, all outfitting the leisure bike enthusiast.</p></div>
+  </div>
+</section>
+
+<svg class="coastline" viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="90" fill="#FFFFFF"/>
+  <polygon points="0,90 140,40 300,75 460,25 620,65 800,15 980,60 1160,30 1320,70 1440,40 1440,90" fill="#0F4557" opacity="0.9"/>
+  <path d="M0,70 C 200,50 360,88 540,62 C 720,38 900,78 1080,58 C 1260,38 1360,62 1440,52 L1440,90 L0,90 Z" fill="#3FBFB8" opacity="0.85"/>
+</svg>
+
+<section class="data-zone" id="data">
+  <div class="section-head">
+    <span class="eyebrow">// student &amp; instructor access</span>
+    <h2>Data &amp; Learning Resources</h2>
+    <p>This is where the storefront ends and the coursework begins. Everything below connects to the same live Ace Bikes data, structured for Power Query.</p>
   </div>
 
-  <div class="content">
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Total Revenue</div>
-          <div class="stat-value">$312,480</div>
-          <div class="stat-delta up">↑ 9.3% vs last year</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Sales</div>
-          <div class="stat-value">1,847</div>
-          <div class="stat-delta up">↑ 6.2% vs last year</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Active Customers</div>
-          <div class="stat-value">584</div>
-          <div class="stat-delta up">↑ 4.1% vs last year</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Low / Out of Stock</div>
-          <div class="stat-value" style="color: var(--warning)">9</div>
-          <div class="stat-delta down">↑ 4 since last week</div>
-        </div>
-      </div>
-
-      <div class="charts-row">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Monthly Revenue</div>
-              <div class="card-sub">January – December 2024</div>
-            </div>
-          </div>
-          <div class="card-body">
-            <canvas id="revenueChart" height="90"></canvas>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Sales by Category</div>
-          </div>
-          <div class="card-body">
-            <div class="category-row">
-              <div class="category-name-col">Bikes</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:72%; background:#f97316"></div></div>
-              <div class="category-pct">72%</div>
-            </div>
-            <div class="category-row">
-              <div class="category-name-col">Accessories</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:55%; background:#3b82f6"></div></div>
-              <div class="category-pct">55%</div>
-            </div>
-            <div class="category-row">
-              <div class="category-name-col">Helmets & Safety</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:41%; background:#10b981"></div></div>
-              <div class="category-pct">41%</div>
-            </div>
-            <div class="category-row">
-              <div class="category-name-col">Apparel</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:29%; background:#8b5cf6"></div></div>
-              <div class="category-pct">29%</div>
-            </div>
-            <div class="category-row">
-              <div class="category-name-col">Tools & Maintenance</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:21%; background:#f59e0b"></div></div>
-              <div class="category-pct">21%</div>
-            </div>
-            <div class="category-row">
-              <div class="category-name-col">Parts & Components</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:16%; background:#ef4444"></div></div>
-              <div class="category-pct">16%</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Recent Sales</div>
-          <div style="font-size:12px; color: var(--text-tertiary)">Last 5 transactions</div>
-        </div>
-        <div class="card-body">
-          <div class="recent-row">
-            <div class="customer-avatar" style="background: linear-gradient(135deg, #f97316, #ef4444)">PM</div>
-            <div class="recent-info">
-              <div class="recent-name">Patterson, Michael</div>
-              <div class="recent-date">Sale #1847 · Dec 15, 2024 · 3:22 PM</div>
-            </div>
-            <span class="badge badge-orange">In-Store</span>
-            <div class="recent-amount">$1,249.00</div>
-          </div>
-          <div class="recent-row">
-            <div class="customer-avatar" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6)">LW</div>
-            <div class="recent-info">
-              <div class="recent-name">Walsh, Lauren</div>
-              <div class="recent-date">Sale #1846 · Dec 15, 2024 · 1:47 PM</div>
-            </div>
-            <span class="badge badge-green">Online</span>
-            <div class="recent-amount">$84.98</div>
-          </div>
-          <div class="recent-row">
-            <div class="customer-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6)">RK</div>
-            <div class="recent-info">
-              <div class="recent-name">Kowalski, Ryan</div>
-              <div class="recent-date">Sale #1845 · Dec 14, 2024 · 5:10 PM</div>
-            </div>
-            <span class="badge badge-orange">In-Store</span>
-            <div class="recent-amount">$347.50</div>
-          </div>
-          <div class="recent-row">
-            <div class="customer-avatar" style="background: linear-gradient(135deg, #8b5cf6, #ec4899)">AN</div>
-            <div class="recent-info">
-              <div class="recent-name">Nguyen, Amy</div>
-              <div class="recent-date">Sale #1844 · Dec 14, 2024 · 11:05 AM</div>
-            </div>
-            <span class="badge badge-green">Online</span>
-            <div class="recent-amount">$129.99</div>
-          </div>
-          <div class="recent-row">
-            <div class="customer-avatar" style="background: linear-gradient(135deg, #f59e0b, #f97316)">DS</div>
-            <div class="recent-info">
-              <div class="recent-name">Singh, David</div>
-              <div class="recent-date">Sale #1843 · Dec 13, 2024 · 2:38 PM</div>
-            </div>
-            <span class="badge badge-orange">In-Store</span>
-            <div class="recent-amount">$64.97</div>
-          </div>
-        </div>
-      </div>
+  <div class="data-grid">
+    <div class="data-card">
+      <h3>1. One-time setup in Power Query</h3>
+      <p>Paste this into a blank query's Advanced Editor once. Name the query <code>GetAceBikesTable</code>.</p>
+      <pre id="pq-function">let
+    GetAceBikesTable = (tableName as text) as table =&gt;
+        let
+            BaseUrl = "https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/",
+            ApiKey = "&lt;your course anon key&gt;",
+            Source = Json.Document(
+                Web.Contents(
+                    BaseUrl &amp; tableName,
+                    [
+                        Headers = [
+                            apikey = ApiKey,
+                            Authorization = "Bearer " &amp; ApiKey
+                        ]
+                    ]
+                )
+            ),
+            AsTable = Table.FromRecords(Source)
+        in
+            AsTable
+in
+    GetAceBikesTable</pre>
+      <button class="copy-btn" onclick="copyPQ()">Copy function</button>
     </div>
 
-    <!-- PRODUCTS -->
-    <div class="page" id="page-products">
-      <div class="table-toolbar">
-        <div class="search-box">
-          <span>🔍</span>
-          <input type="text" placeholder="Search products..." oninput="filterTable('products-table', this.value)">
-        </div>
-        <button class="filter-btn">⊟ Filter</button>
-        <button class="filter-btn">↕ Sort</button>
-        <div class="record-count">Showing 30 of 30 products</div>
-      </div>
-      <div class="card">
-        <div style="overflow-x: auto;">
-          <table class="data-table" id="products-table">
-            <thead>
-              <tr>
-                <th>Product ID</th>
-                <th>Product Name</th>
-                <th>Category</th>
-                <th>Unit Price</th>
-                <th>Unit Cost</th>
-                <th>Inventory</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="mono">PRD001</td><td>Trail Blazer 27.5 MTB</td><td><span class="badge badge-orange">Bikes</span></td><td>$899.99</td><td>$520.00</td><td>7</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD002</td><td>City Cruiser Step-Through</td><td><span class="badge badge-orange">Bikes</span></td><td>$649.99</td><td>$370.00</td><td>4</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD003</td><td>Road Runner 700c</td><td><span class="badge badge-orange">Bikes</span></td><td>$1,199.99</td><td>$700.00</td><td>3</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD004</td><td>Kids Balance Bike 12"</td><td><span class="badge badge-orange">Bikes</span></td><td>$149.99</td><td>$75.00</td><td>11</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD005</td><td>E-Commuter Pro 700c</td><td><span class="badge badge-orange">Bikes</span></td><td>$2,499.99</td><td>$1,600.00</td><td>2</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD006</td><td>Folding Urban Bike 20"</td><td><span class="badge badge-orange">Bikes</span></td><td>$549.99</td><td>$310.00</td><td>0</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD007</td><td>MIPS Road Helmet</td><td><span class="badge badge-green">Helmets & Safety</span></td><td>$119.99</td><td>$52.00</td><td>14</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD008</td><td>Kids Helmet — Adjustable</td><td><span class="badge badge-green">Helmets & Safety</span></td><td>$44.99</td><td>$18.50</td><td>22</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD009</td><td>MTB Full-Face Helmet</td><td><span class="badge badge-green">Helmets & Safety</span></td><td>$189.99</td><td>$90.00</td><td>6</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD010</td><td>High-Vis Safety Vest</td><td><span class="badge badge-green">Helmets & Safety</span></td><td>$24.99</td><td>$8.75</td><td>31</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD011</td><td>Cycling Gloves — Padded</td><td><span class="badge badge-purple">Apparel</span></td><td>$34.99</td><td>$13.50</td><td>18</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD012</td><td>Men's Bib Shorts</td><td><span class="badge badge-purple">Apparel</span></td><td>$79.99</td><td>$32.00</td><td>9</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD013</td><td>Women's Cycling Jersey</td><td><span class="badge badge-purple">Apparel</span></td><td>$64.99</td><td>$26.00</td><td>13</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD014</td><td>Thermal Base Layer</td><td><span class="badge badge-purple">Apparel</span></td><td>$54.99</td><td>$21.00</td><td>0</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD015</td><td>Waterproof Cycling Jacket</td><td><span class="badge badge-purple">Apparel</span></td><td>$129.99</td><td>$58.00</td><td>5</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD016</td><td>U-Lock Heavy Duty</td><td><span class="badge badge-blue">Accessories</span></td><td>$49.99</td><td>$19.50</td><td>27</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD017</td><td>Front & Rear Light Set</td><td><span class="badge badge-blue">Accessories</span></td><td>$39.99</td><td>$14.00</td><td>33</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD018</td><td>Pannier Rack Bag</td><td><span class="badge badge-blue">Accessories</span></td><td>$64.99</td><td>$27.00</td><td>8</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD019</td><td>Handlebar Bag — 5L</td><td><span class="badge badge-blue">Accessories</span></td><td>$44.99</td><td>$17.25</td><td>16</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD020</td><td>Bike Computer GPS</td><td><span class="badge badge-blue">Accessories</span></td><td>$149.99</td><td>$72.00</td><td>4</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD021</td><td>Water Bottle Cage</td><td><span class="badge badge-blue">Accessories</span></td><td>$14.99</td><td>$4.50</td><td>42</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD022</td><td>Floor Pump — Steel</td><td><span class="badge badge-yellow">Tools & Maintenance</span></td><td>$54.99</td><td>$22.00</td><td>15</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD023</td><td>Multi-Tool 17-in-1</td><td><span class="badge badge-yellow">Tools & Maintenance</span></td><td>$29.99</td><td>$10.50</td><td>24</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD024</td><td>Chain Lubricant (150ml)</td><td><span class="badge badge-yellow">Tools & Maintenance</span></td><td>$12.99</td><td>$4.25</td><td>38</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD025</td><td>Puncture Repair Kit</td><td><span class="badge badge-yellow">Tools & Maintenance</span></td><td>$9.99</td><td>$2.75</td><td>51</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD026</td><td>Shimano Brake Pads (pair)</td><td><span class="badge badge-teal">Parts & Components</span></td><td>$22.99</td><td>$8.50</td><td>29</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD027</td><td>700c Inner Tube (2pk)</td><td><span class="badge badge-teal">Parts & Components</span></td><td>$16.99</td><td>$5.50</td><td>44</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD028</td><td>KMC 11-Speed Chain</td><td><span class="badge badge-teal">Parts & Components</span></td><td>$34.99</td><td>$14.00</td><td>19</td><td><span class="badge badge-green">A</span></td></tr>
-              <tr><td class="mono">PRD029</td><td>Comfort Saddle — Gel</td><td><span class="badge badge-teal">Parts & Components</span></td><td>$49.99</td><td>$19.50</td><td>3</td><td><span class="badge badge-gray">D</span></td></tr>
-              <tr><td class="mono">PRD030</td><td>Ergonomic Handlebar Grips</td><td><span class="badge badge-teal">Parts & Components</span></td><td>$19.99</td><td>$6.75</td><td>0</td><td><span class="badge badge-gray">D</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <div class="pagination-info">Showing 1–30 of 30 products</div>
-          <div class="pagination-btns">
-            <div class="page-btn">‹</div>
-            <div class="page-btn active">1</div>
-            <div class="page-btn">›</div>
-          </div>
-        </div>
-      </div>
+    <div class="data-card">
+      <h3>2. Load any table by name</h3>
+      <p>Once the function exists, get any table with a single line:</p>
+      <pre>GetAceBikesTable("products")
+GetAceBikesTable("customers")
+GetAceBikesTable("categories")
+GetAceBikesTable("sales")
+GetAceBikesTable("line_items")</pre>
+      <p style="margin-top:14px;">Your instructor will provide the anon key for your course section.</p>
     </div>
 
-    <!-- CUSTOMERS -->
-    <div class="page" id="page-customers">
-      <div class="table-toolbar">
-        <div class="search-box">
-          <span>🔍</span>
-          <input type="text" placeholder="Search customers..." oninput="filterTable('customers-table', this.value)">
-        </div>
-        <button class="filter-btn">⊟ Filter</button>
-        <div class="record-count">Showing 20 of 20 customers</div>
-      </div>
-      <div class="card">
-        <div style="overflow-x: auto;">
-          <table class="data-table" id="customers-table">
-            <thead>
-              <tr>
-                <th>Customer ID</th>
-                <th>Customer Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Total Orders</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="mono">CUS001</td><td>Patterson, Michael</td><td>m.patterson@email.com</td><td>604-555-0181</td><td>14</td></tr>
-              <tr><td class="mono">CUS002</td><td>Walsh, Lauren</td><td>l.walsh@email.com</td><td>778-555-0234</td><td>9</td></tr>
-              <tr><td class="mono">CUS003</td><td>Kowalski, Ryan</td><td>r.kowalski@email.com</td><td>604-555-0372</td><td>22</td></tr>
-              <tr><td class="mono">CUS004</td><td>Nguyen, Amy</td><td>a.nguyen@email.com</td><td>604-555-0419</td><td>6</td></tr>
-              <tr><td class="mono">CUS005</td><td>Singh, David</td><td>d.singh@email.com</td><td>778-555-0553</td><td>18</td></tr>
-              <tr><td class="mono">CUS006</td><td>Fernandez, Elena</td><td>e.fernandez@email.com</td><td>604-555-0627</td><td>11</td></tr>
-              <tr><td class="mono">CUS007</td><td>Osei, Kwame</td><td>k.osei@email.com</td><td>778-555-0748</td><td>4</td></tr>
-              <tr><td class="mono">CUS008</td><td>Brennan, Caitlin</td><td>c.brennan@email.com</td><td>604-555-0836</td><td>16</td></tr>
-              <tr><td class="mono">CUS009</td><td>Yamamoto, Hiro</td><td>h.yamamoto@email.com</td><td>604-555-0964</td><td>7</td></tr>
-              <tr><td class="mono">CUS010</td><td>Larsson, Maja</td><td>m.larsson@email.com</td><td>778-555-1071</td><td>13</td></tr>
-              <tr><td class="mono">CUS011</td><td>Ibrahim, Tariq</td><td>t.ibrahim@email.com</td><td>604-555-1143</td><td>5</td></tr>
-              <tr><td class="mono">CUS012</td><td>Dubois, Camille</td><td>c.dubois@email.com</td><td>778-555-1289</td><td>20</td></tr>
-              <tr><td class="mono">CUS013</td><td>Mackenzie, Fraser</td><td>f.mackenzie@email.com</td><td>604-555-1314</td><td>8</td></tr>
-              <tr><td class="mono">CUS014</td><td>Patel, Nisha</td><td>n.patel@email.com</td><td>604-555-1456</td><td>3</td></tr>
-              <tr><td class="mono">CUS015</td><td>Andersen, Bjorn</td><td>b.andersen@email.com</td><td>778-555-1527</td><td>17</td></tr>
-              <tr><td class="mono">CUS016</td><td>Oliveira, Beatriz</td><td>b.oliveira@email.com</td><td>604-555-1638</td><td>9</td></tr>
-              <tr><td class="mono">CUS017</td><td>Mensah, Abena</td><td>a.mensah@email.com</td><td>778-555-1702</td><td>6</td></tr>
-              <tr><td class="mono">CUS018</td><td>Carlson, Jake</td><td>j.carlson@email.com</td><td>604-555-1819</td><td>12</td></tr>
-              <tr><td class="mono">CUS019</td><td>Tanaka, Yuki</td><td>y.tanaka@email.com</td><td>604-555-1947</td><td>4</td></tr>
-              <tr><td class="mono">CUS020</td><td>Reyes, Carlos</td><td>c.reyes@email.com</td><td>778-555-2063</td><td>10</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <div class="pagination-info">Showing 1–20 of 20 customers</div>
-          <div class="pagination-btns">
-            <div class="page-btn">‹</div>
-            <div class="page-btn active">1</div>
-            <div class="page-btn">›</div>
-          </div>
-        </div>
-      </div>
+    <div class="data-card">
+      <h3>3. Data dictionary</h3>
+      <table class="data-dict">
+        <tr><th>Table</th><th>Grain</th><th>Key</th></tr>
+        <tr><td>customers</td><td>1 row = 1 customer</td><td>customerid</td></tr>
+        <tr><td>products</td><td>1 row = 1 product</td><td>productid</td></tr>
+        <tr><td>categories</td><td>1 row = 1 category</td><td>categoryid</td></tr>
+        <tr><td>sales</td><td>1 row = 1 sale</td><td>saleid</td></tr>
+        <tr><td>line_items</td><td>1 row = 1 product within a sale</td><td>lineitemid</td></tr>
+      </table>
     </div>
 
-    <!-- SALES -->
-    <div class="page" id="page-sales">
-      <div class="table-toolbar">
-        <div class="search-box">
-          <span>🔍</span>
-          <input type="text" placeholder="Search sales..." oninput="filterTable('sales-table', this.value)">
-        </div>
-        <button class="filter-btn">⊟ Filter</button>
-        <button class="filter-btn">📅 Date range</button>
-        <div class="record-count">Showing 15 of 1,847 sales</div>
-      </div>
-      <div class="card">
-        <div style="overflow-x: auto;">
-          <table class="data-table" id="sales-table">
-            <thead>
-              <tr>
-                <th>Sale ID</th>
-                <th>Date & Time</th>
-                <th>Customer</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td class="mono">SAL1847</td><td>Dec 15, 2024 15:22</td><td>Patterson, Michael</td><td>2</td><td>$1,249.00</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1846</td><td>Dec 15, 2024 13:47</td><td>Walsh, Lauren</td><td>3</td><td>$84.98</td><td><span class="badge badge-green">Online</span></td></tr>
-              <tr><td class="mono">SAL1845</td><td>Dec 14, 2024 17:10</td><td>Kowalski, Ryan</td><td>4</td><td>$347.50</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1844</td><td>Dec 14, 2024 11:05</td><td>Nguyen, Amy</td><td>1</td><td>$129.99</td><td><span class="badge badge-green">Online</span></td></tr>
-              <tr><td class="mono">SAL1843</td><td>Dec 13, 2024 14:38</td><td>Singh, David</td><td>3</td><td>$64.97</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1842</td><td>Dec 13, 2024 10:22</td><td>Fernandez, Elena</td><td>1</td><td>$899.99</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1841</td><td>Dec 12, 2024 16:14</td><td>Brennan, Caitlin</td><td>5</td><td>$223.94</td><td><span class="badge badge-green">Online</span></td></tr>
-              <tr><td class="mono">SAL1840</td><td>Dec 12, 2024 09:48</td><td>Larsson, Maja</td><td>2</td><td>$184.98</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1839</td><td>Dec 11, 2024 15:33</td><td>Dubois, Camille</td><td>6</td><td>$412.93</td><td><span class="badge badge-green">Online</span></td></tr>
-              <tr><td class="mono">SAL1838</td><td>Dec 11, 2024 12:07</td><td>Andersen, Bjorn</td><td>3</td><td>$94.97</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1837</td><td>Dec 10, 2024 14:51</td><td>Carlson, Jake</td><td>2</td><td>$169.98</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1836</td><td>Dec 10, 2024 10:29</td><td>Tanaka, Yuki</td><td>1</td><td>$649.99</td><td><span class="badge badge-green">Online</span></td></tr>
-              <tr><td class="mono">SAL1835</td><td>Dec 09, 2024 16:44</td><td>Mackenzie, Fraser</td><td>4</td><td>$137.96</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-              <tr><td class="mono">SAL1834</td><td>Dec 09, 2024 11:18</td><td>Reyes, Carlos</td><td>2</td><td>$74.98</td><td><span class="badge badge-green">Online</span></td></tr>
-              <tr><td class="mono">SAL1833</td><td>Dec 08, 2024 13:55</td><td>Yamamoto, Hiro</td><td>3</td><td>$299.97</td><td><span class="badge badge-orange">In-Store</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <div class="pagination-info">Showing 1–15 of 1,847 sales</div>
-          <div class="pagination-btns">
-            <div class="page-btn">‹</div>
-            <div class="page-btn active">1</div>
-            <div class="page-btn">2</div>
-            <div class="page-btn">3</div>
-            <div class="page-btn">…</div>
-            <div class="page-btn">123</div>
-            <div class="page-btn">›</div>
-          </div>
-        </div>
-      </div>
+    <div class="data-card">
+      <h3>4. Practice files (messier, real-world data)</h3>
+      <p>Multi-location export files with the kind of quality issues you'll encounter in the field — mixed CSV/Excel, inconsistent formats, missing values.</p>
+      <p style="opacity:0.6; font-size:0.82rem;">Available to your course section during the relevant module — ask your instructor for the current link.</p>
     </div>
-
-    <!-- DEVELOPER ACCESS -->
-    <div class="page" id="page-devaccess">
-      <div class="dev-hero">
-        <div class="dev-hero-label">🔌 Developer Access</div>
-        <div class="dev-hero-title">Database API Access</div>
-        <div class="dev-hero-sub">Connect directly to the Ace Bikes database using Power Query or any REST-compatible tool. Use the credentials below to access the underlying data for analysis and reporting.</div>
-      </div>
-
-      <div class="alert-banner">
-        <span>⚠️</span>
-        <div><strong>Read-only access.</strong> These credentials provide read-only access to the database. You cannot add, edit, or delete data using this connection. Do not share these credentials publicly.</div>
-      </div>
-
-      <div class="dev-grid">
-        <div class="dev-card">
-          <div class="dev-card-header">
-            <div class="dev-card-icon orange">🔗</div>
-            <div class="dev-card-title">Connection Details</div>
-          </div>
-          <div class="dev-card-body">
-            <div class="endpoint-block">
-              <div class="endpoint-label">Base URL</div>
-              <div class="endpoint-url">https://kvuukeyzdeqltctywqdk.supabase.co</div>
-              <button class="copy-btn" onclick="copyText(this, 'https://kvuukeyzdeqltctywqdk.supabase.co')">Copy</button>
-            </div>
-            <div class="endpoint-block">
-              <div class="endpoint-label">API Key (anon/public)</div>
-              <div class="endpoint-url">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og</div>
-              <button class="copy-btn" onclick="copyText(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og')">Copy</button>
-            </div>
-            <div class="endpoint-block">
-              <div class="endpoint-label">Available Tables</div>
-              <div class="endpoint-url" style="color: #fb923c">customers &nbsp;·&nbsp; products &nbsp;·&nbsp; categories<br>sales &nbsp;·&nbsp; line_items</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="dev-card">
-          <div class="dev-card-header">
-            <div class="dev-card-icon blue">📋</div>
-            <div class="dev-card-title">Connecting with Power Query</div>
-          </div>
-          <div class="dev-card-body">
-            <ol class="steps-list">
-              <li><div class="step-num">1</div><div>In Excel, go to <strong>Data → Get Data → From Other Sources → From Web</strong></div></li>
-              <li><div class="step-num">2</div><div>Enter the table endpoint URL:<br><code>[Base URL]/rest/v1/[table_name]</code></div></li>
-              <li><div class="step-num">3</div><div>In the HTTP request headers, add:<br><code>apikey: [your API key]</code></div></li>
-              <li><div class="step-num">4</div><div>Set <strong>Authorization</strong> header to:<br><code>Bearer [your API key]</code></div></li>
-              <li><div class="step-num">5</div><div>Load the JSON response into Power Query and transform as needed</div></li>
-              <li><div class="step-num">6</div><div>Repeat for each table, then load all tables <strong>to the Data Model</strong></div></li>
-            </ol>
-          </div>
-        </div>
-      </div>
-
-      <div class="dev-card">
-        <div class="dev-card-header">
-          <div class="dev-card-icon yellow">📐</div>
-          <div class="dev-card-title">Database Schema Reference</div>
-        </div>
-        <div class="dev-card-body">
-          <div class="schema-tabs">
-            <div class="schema-tab active" onclick="showSchema('customers', this)">Customers</div>
-            <div class="schema-tab" onclick="showSchema('products', this)">Products</div>
-            <div class="schema-tab" onclick="showSchema('categories', this)">Categories</div>
-            <div class="schema-tab" onclick="showSchema('sales', this)">Sales</div>
-            <div class="schema-tab" onclick="showSchema('lineitems', this)">Line Items</div>
-          </div>
-
-          <div class="schema-panel active" id="schema-customers">
-            <table class="table-schema">
-              <thead><tr><th>Field Name</th><th>Type</th><th>Key</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td class="field-name">CustomerID</td><td>Integer</td><td><span class="key-badge key-pk">PK</span></td><td>Auto-incrementing unique identifier</td></tr>
-                <tr><td class="field-name">CustomerName</td><td>Text</td><td></td><td>Stored as <em>LastName, FirstName</em></td></tr>
-                <tr><td class="field-name">Email</td><td>Text</td><td></td><td>Customer email address</td></tr>
-                <tr><td class="field-name">CustomerPhone</td><td>Text</td><td></td><td>Stored as text to preserve formatting</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="schema-panel" id="schema-products">
-            <table class="table-schema">
-              <thead><tr><th>Field Name</th><th>Type</th><th>Key</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td class="field-name">ProductID</td><td>Integer</td><td><span class="key-badge key-pk">PK</span></td><td>Auto-incrementing unique identifier</td></tr>
-                <tr><td class="field-name">ProductName</td><td>Text</td><td></td><td></td></tr>
-                <tr><td class="field-name">ProductDescription</td><td>Text</td><td></td><td>Long-form product description</td></tr>
-                <tr><td class="field-name">ProductUnitPrice</td><td>Decimal</td><td></td><td>Retail selling price</td></tr>
-                <tr><td class="field-name">ProductUnitCost</td><td>Decimal</td><td></td><td>Wholesale cost to store</td></tr>
-                <tr><td class="field-name">ProductInventory</td><td>Integer</td><td></td><td>Current units in stock</td></tr>
-                <tr><td class="field-name">StockStatus</td><td>Text</td><td></td><td><strong>A</strong> = Active, <strong>D</strong> = Discontinued</td></tr>
-                <tr><td class="field-name">CategoryID</td><td>Integer</td><td><span class="key-badge key-fk">FK</span></td><td>References Categories.CategoryID</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="schema-panel" id="schema-categories">
-            <table class="table-schema">
-              <thead><tr><th>Field Name</th><th>Type</th><th>Key</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td class="field-name">CategoryID</td><td>Integer</td><td><span class="key-badge key-pk">PK</span></td><td>Auto-incrementing unique identifier</td></tr>
-                <tr><td class="field-name">CategoryName</td><td>Text</td><td></td><td></td></tr>
-                <tr><td class="field-name">CategoryDescription</td><td>Text</td><td></td><td>Long-form category description</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="schema-panel" id="schema-sales">
-            <table class="table-schema">
-              <thead><tr><th>Field Name</th><th>Type</th><th>Key</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td class="field-name">SaleID</td><td>Integer</td><td><span class="key-badge key-pk">PK</span></td><td>Auto-incrementing unique identifier</td></tr>
-                <tr><td class="field-name">SaleDateTime</td><td>Timestamp</td><td></td><td>Date and time of transaction</td></tr>
-                <tr><td class="field-name">SaleType</td><td>Text</td><td></td><td><strong>IN</strong> = In-Store, <strong>ON</strong> = Online</td></tr>
-                <tr><td class="field-name">CustomerID</td><td>Integer</td><td><span class="key-badge key-fk">FK</span></td><td>References Customers.CustomerID</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="schema-panel" id="schema-lineitems">
-            <table class="table-schema">
-              <thead><tr><th>Field Name</th><th>Type</th><th>Key</th><th>Notes</th></tr></thead>
-              <tbody>
-                <tr><td class="field-name">LineItemID</td><td>Integer</td><td><span class="key-badge key-pk">PK</span></td><td>Auto-incrementing unique identifier</td></tr>
-                <tr><td class="field-name">SaleID</td><td>Integer</td><td><span class="key-badge key-fk">FK</span></td><td>References Sales.SaleID</td></tr>
-                <tr><td class="field-name">ProductID</td><td>Integer</td><td><span class="key-badge key-fk">FK</span></td><td>References Products.ProductID</td></tr>
-                <tr><td class="field-name">ProductQuantity</td><td>Integer</td><td></td><td>Units purchased in this line item</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
+</section>
+
+<footer>
+  Ace Bikes is a fictional company used for educational purposes in BCIT's BITMAN program. Not a real retailer.
+</footer>
 
 <script>
-function showPage(pageId, navEl) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  navEl.classList.add('active');
-  const titles = {
-    dashboard: ['Dashboard', 'Store overview'],
-    products: ['Products', 'Manage your product catalogue'],
-    customers: ['Customers', 'Customer records'],
-    sales: ['Sales & Orders', 'Transaction history'],
-    devaccess: ['Database Access', 'API credentials & schema reference']
-  };
-  document.getElementById('topbar-title').textContent = titles[pageId][0];
-  document.getElementById('topbar-sub').textContent = titles[pageId][1];
-}
+  const SUPABASE_URL = "https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og";
 
-function filterTable(tableId, query) {
-  const rows = document.querySelectorAll('#' + tableId + ' tbody tr');
-  const q = query.toLowerCase();
-  rows.forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
-  });
-}
+  async function fetchTable(table, query = "") {
+    const res = await fetch(SUPABASE_URL + table + query, {
+      headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
+    });
+    if (!res.ok) throw new Error("Request failed: " + res.status);
+    return res.json();
+  }
 
-function showSchema(name, tab) {
-  document.querySelectorAll('.schema-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.schema-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('schema-' + name).classList.add('active');
-  tab.classList.add('active');
-}
-
-function copyText(btn, text) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  });
-}
-
-const ctx = document.getElementById('revenueChart').getContext('2d');
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-    datasets: [{
-      label: 'Revenue',
-      data: [18200, 14800, 22400, 28900, 41200, 38600, 35100, 29800, 24300, 21400, 19800, 18480],
-      backgroundColor: 'rgba(249,115,22,0.12)',
-      borderColor: '#f97316',
-      borderWidth: 2,
-      borderRadius: 4,
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: {
-        beginAtZero: true,
-        grid: { color: '#f3f4f6' },
-        ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k', font: { size: 11 } }
-      },
-      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+  async function loadCategories() {
+    const grid = document.getElementById("cat-grid");
+    try {
+      const categories = await fetchTable("categories", "?select=*");
+      if (!categories.length) { grid.innerHTML = '<div class="empty-note">No categories found.</div>'; return; }
+      grid.innerHTML = categories.map(c => `
+        <div class="cat-card">
+          <h3>${c.categoryname || c.category1 || c.name || "Category"}</h3>
+          <span>ID: ${c.categoryid ?? ""}</span>
+        </div>
+      `).join("");
+    } catch (e) {
+      grid.innerHTML = '<div class="empty-note">Categories unavailable right now — check your connection.</div>';
     }
   }
-});
+
+  async function loadProducts() {
+    const grid = document.getElementById("prod-grid");
+    try {
+      const products = await fetchTable("products", "?select=*&limit=8");
+      if (!products.length) { grid.innerHTML = '<div class="empty-note">No products found.</div>'; return; }
+      grid.innerHTML = products.map(p => `
+        <div class="prod-card">
+          <div class="prod-swatch">${p.productsku || p.categoryid || "SKU"}</div>
+          <div class="prod-body">
+            <h4>${p.productname || "Product"}</h4>
+            <div class="prod-price">$${Number(p.productunitprice || 0).toFixed(2)}</div>
+            <div class="prod-cat">${p.productdescription || ""}</div>
+          </div>
+        </div>
+      `).join("");
+    } catch (e) {
+      grid.innerHTML = '<div class="empty-note">Products unavailable right now — check your connection.</div>';
+    }
+  }
+
+  function copyPQ() {
+    const text = document.getElementById("pq-function").innerText;
+    navigator.clipboard.writeText(text);
+    event.target.textContent = "Copied!";
+    setTimeout(() => { event.target.textContent = "Copy function"; }, 1800);
+  }
+
+  loadCategories();
+  loadProducts();
 </script>
+
 </body>
 </html>
