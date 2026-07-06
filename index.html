@@ -464,27 +464,27 @@
       <p>Each URL already includes the course access key — just copy and paste.</p>
       <div class="url-row">
         <span class="url-label">products</span>
-        <pre id="url-products">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/products?apikey=&lt;your course anon key&gt;</pre>
+        <pre id="url-products">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/products?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
         <button class="copy-btn" onclick="copyURL('url-products', event)">Copy</button>
       </div>
       <div class="url-row">
         <span class="url-label">customers</span>
-        <pre id="url-customers">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/customers?apikey=&lt;your course anon key&gt;</pre>
+        <pre id="url-customers">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/customers?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
         <button class="copy-btn" onclick="copyURL('url-customers', event)">Copy</button>
       </div>
       <div class="url-row">
         <span class="url-label">categories</span>
-        <pre id="url-categories">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/categories?apikey=&lt;your course anon key&gt;</pre>
+        <pre id="url-categories">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/categories?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
         <button class="copy-btn" onclick="copyURL('url-categories', event)">Copy</button>
       </div>
       <div class="url-row">
         <span class="url-label">sales</span>
-        <pre id="url-sales">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/sales?apikey=&lt;your course anon key&gt;</pre>
+        <pre id="url-sales">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/sales?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
         <button class="copy-btn" onclick="copyURL('url-sales', event)">Copy</button>
       </div>
       <div class="url-row">
         <span class="url-label">line_items</span>
-        <pre id="url-lineitems">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/line_items?apikey=&lt;your course anon key&gt;</pre>
+        <pre id="url-lineitems">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/line_items?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
         <button class="copy-btn" onclick="copyURL('url-lineitems', event)">Copy</button>
       </div>
       <p style="margin-top:14px; opacity:0.6; font-size:0.8rem;">Your instructor will give you the anon key to paste in place of &lt;your course anon key&gt;.</p>
@@ -516,7 +516,7 @@
 
 <script>
   const SUPABASE_URL = "https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/";
-  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og";
+  const ANON_KEY = "sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf";
 
   async function fetchTable(table, query = "") {
     const res = await fetch(SUPABASE_URL + table + query, {
