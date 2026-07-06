@@ -305,8 +305,36 @@
     cursor: pointer;
     font-weight: 600;
     margin-top: 4px;
+    flex-shrink: 0;
   }
   .copy-btn:hover { opacity: 0.9; }
+  .url-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    min-width: 0;
+  }
+  .url-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--teal-bright);
+    width: 82px;
+    flex-shrink: 0;
+  }
+  .url-row pre {
+    margin: 0;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  @media (max-width: 600px) {
+    .url-row { flex-wrap: wrap; }
+    .url-row pre { width: 100%; order: 3; }
+  }
 
   footer {
     background: var(--teal-darker);
@@ -421,41 +449,45 @@
 
   <div class="data-grid">
     <div class="data-card">
-      <h3>1. One-time setup in Power Query</h3>
-      <p>Paste this into a blank query's Advanced Editor once. Name the query <code>GetAceBikesTable</code>.</p>
-      <pre id="pq-function">let
-    GetAceBikesTable = (tableName as text) as table =&gt;
-        let
-            BaseUrl = "https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/",
-            ApiKey = "&lt;your course anon key&gt;",
-            Source = Json.Document(
-                Web.Contents(
-                    BaseUrl &amp; tableName,
-                    [
-                        Headers = [
-                            apikey = ApiKey,
-                            Authorization = "Bearer " &amp; ApiKey
-                        ]
-                    ]
-                )
-            ),
-            AsTable = Table.FromRecords(Source)
-        in
-            AsTable
-in
-    GetAceBikesTable</pre>
-      <button class="copy-btn" onclick="copyPQ()">Copy function</button>
+      <h3>1. Connect in Power Query (no code needed)</h3>
+      <p>For each table you want, repeat these steps:</p>
+      <ol style="padding-left: 20px; opacity: 0.85; font-size: 0.9rem; margin: 0 0 4px;">
+        <li style="margin-bottom:6px;">Data tab → <strong>Get Data → From Web</strong></li>
+        <li style="margin-bottom:6px;">Paste the table's URL (copy one from the card on the right) → <strong>OK</strong></li>
+        <li style="margin-bottom:6px;">Click <strong>To Table</strong> → OK</li>
+        <li>Click the expand icon on the column header → <strong>Expand</strong> → OK</li>
+      </ol>
     </div>
 
     <div class="data-card">
-      <h3>2. Load any table by name</h3>
-      <p>Once the function exists, get any table with a single line:</p>
-      <pre>GetAceBikesTable("products")
-GetAceBikesTable("customers")
-GetAceBikesTable("categories")
-GetAceBikesTable("sales")
-GetAceBikesTable("line_items")</pre>
-      <p style="margin-top:14px;">Your instructor will provide the anon key for your course section.</p>
+      <h3>2. Copy a table's URL</h3>
+      <p>Each URL already includes the course access key — just copy and paste.</p>
+      <div class="url-row">
+        <span class="url-label">products</span>
+        <pre id="url-products">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/products?apikey=&lt;your course anon key&gt;</pre>
+        <button class="copy-btn" onclick="copyURL('url-products', event)">Copy</button>
+      </div>
+      <div class="url-row">
+        <span class="url-label">customers</span>
+        <pre id="url-customers">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/customers?apikey=&lt;your course anon key&gt;</pre>
+        <button class="copy-btn" onclick="copyURL('url-customers', event)">Copy</button>
+      </div>
+      <div class="url-row">
+        <span class="url-label">categories</span>
+        <pre id="url-categories">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/categories?apikey=&lt;your course anon key&gt;</pre>
+        <button class="copy-btn" onclick="copyURL('url-categories', event)">Copy</button>
+      </div>
+      <div class="url-row">
+        <span class="url-label">sales</span>
+        <pre id="url-sales">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/sales?apikey=&lt;your course anon key&gt;</pre>
+        <button class="copy-btn" onclick="copyURL('url-sales', event)">Copy</button>
+      </div>
+      <div class="url-row">
+        <span class="url-label">line_items</span>
+        <pre id="url-lineitems">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/line_items?apikey=&lt;your course anon key&gt;</pre>
+        <button class="copy-btn" onclick="copyURL('url-lineitems', event)">Copy</button>
+      </div>
+      <p style="margin-top:14px; opacity:0.6; font-size:0.8rem;">Your instructor will give you the anon key to paste in place of &lt;your course anon key&gt;.</p>
     </div>
 
     <div class="data-card">
@@ -530,11 +562,13 @@ GetAceBikesTable("line_items")</pre>
     }
   }
 
-  function copyPQ() {
-    const text = document.getElementById("pq-function").innerText;
+  function copyURL(id, evt) {
+    const text = document.getElementById(id).innerText;
     navigator.clipboard.writeText(text);
-    event.target.textContent = "Copied!";
-    setTimeout(() => { event.target.textContent = "Copy function"; }, 1800);
+    const btn = evt.target;
+    const original = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(() => { btn.textContent = original; }, 1800);
   }
 
   loadCategories();
