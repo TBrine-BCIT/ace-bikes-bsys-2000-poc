@@ -445,6 +445,7 @@
     <span class="eyebrow">// student &amp; instructor access</span>
     <h2>Data &amp; Learning Resources</h2>
     <p>This is where the storefront ends and the coursework begins. Everything below connects to the same live Ace Bikes data, structured for Power Query.</p>
+    <p id="stage-caption" style="display:none; margin-top:10px; font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color: var(--teal-bright);"></p>
   </div>
 
   <div class="data-grid">
@@ -462,43 +463,14 @@
     <div class="data-card">
       <h3>2. Copy a table's URL</h3>
       <p>Each URL already includes the course access key — just copy and paste.</p>
-      <div class="url-row">
-        <span class="url-label">products</span>
-        <pre id="url-products">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/products?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
-        <button class="copy-btn" onclick="copyURL('url-products', event)">Copy</button>
-      </div>
-      <div class="url-row">
-        <span class="url-label">customers</span>
-        <pre id="url-customers">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/customers?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
-        <button class="copy-btn" onclick="copyURL('url-customers', event)">Copy</button>
-      </div>
-      <div class="url-row">
-        <span class="url-label">categories</span>
-        <pre id="url-categories">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/categories?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
-        <button class="copy-btn" onclick="copyURL('url-categories', event)">Copy</button>
-      </div>
-      <div class="url-row">
-        <span class="url-label">sales</span>
-        <pre id="url-sales">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/sales?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
-        <button class="copy-btn" onclick="copyURL('url-sales', event)">Copy</button>
-      </div>
-      <div class="url-row">
-        <span class="url-label">line_items</span>
-        <pre id="url-lineitems">https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/line_items?apikey=sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf</pre>
-        <button class="copy-btn" onclick="copyURL('url-lineitems', event)">Copy</button>
-      </div>
+      <div id="url-list"><!-- populated by JS based on ?stage= --></div>
       <p style="margin-top:14px; opacity:0.6; font-size:0.8rem;">Your instructor will give you the anon key to paste in place of &lt;your course anon key&gt;.</p>
     </div>
 
     <div class="data-card">
       <h3>3. Data dictionary</h3>
       <table class="data-dict">
-        <tr><th>Table</th><th>Grain</th><th>Key</th></tr>
-        <tr><td>customers</td><td>1 row = 1 customer</td><td>customerid</td></tr>
-        <tr><td>products</td><td>1 row = 1 product</td><td>productid</td></tr>
-        <tr><td>categories</td><td>1 row = 1 category</td><td>categoryid</td></tr>
-        <tr><td>sales</td><td>1 row = 1 sale</td><td>saleid</td></tr>
-        <tr><td>line_items</td><td>1 row = 1 product within a sale</td><td>lineitemid</td></tr>
+        <tbody id="data-dict-body"><!-- populated by JS based on ?stage= --></tbody>
       </table>
     </div>
 
@@ -516,7 +488,62 @@
 
 <script>
   const SUPABASE_URL = "https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/";
-  const ANON_KEY = "sb_publishable_csEUIr7WgkD4RFNbsmB40w_XuY_D7pf";
+  const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og";
+
+  // ---------- Stage system ----------
+  // Controls which tables show up in the Data & Learning Resources zone,
+  // so a chapter that hasn't introduced a table yet (e.g. line_items,
+  // taught as a discovery exercise in Ch3) doesn't spoil it on the site.
+  // Add new stages here as later chapters/courses need their own view.
+  // Link format: .../index.html?stage=KEY
+  const TABLES = [
+    { key: "customers",  grain: "1 row = 1 customer",              pk: "customerid" },
+    { key: "products",   grain: "1 row = 1 product",               pk: "productid" },
+    { key: "categories", grain: "1 row = 1 category",              pk: "categoryid" },
+    { key: "sales",      grain: "1 row = 1 sale",                  pk: "saleid" },
+    { key: "line_items", grain: "1 row = 1 product within a sale", pk: "lineitemid" },
+  ];
+
+  const STAGES = {
+    ch3:  { label: "Chapter 3", tables: ["customers", "products", "categories", "sales"] },
+    full: { label: null,        tables: TABLES.map(t => t.key) },
+    // future example:
+    // ch6: { label: "Chapter 6", tables: [...TABLES.map(t => t.key), "weather"] },
+  };
+  const DEFAULT_STAGE = "full";
+
+  function getStage() {
+    const requested = new URLSearchParams(window.location.search).get("stage");
+    return STAGES[requested] ? requested : DEFAULT_STAGE;
+  }
+
+  function renderDataZone() {
+    const stageKey = getStage();
+    const stage = STAGES[stageKey];
+    const visible = TABLES.filter(t => stage.tables.includes(t.key));
+
+    // URL cards
+    const urlList = document.getElementById("url-list");
+    urlList.innerHTML = visible.map(t => `
+      <div class="url-row">
+        <span class="url-label">${t.key}</span>
+        <pre id="url-${t.key}">${SUPABASE_URL}${t.key}?apikey=&lt;your course anon key&gt;</pre>
+        <button class="copy-btn" onclick="copyURL('url-${t.key}', event)">Copy</button>
+      </div>
+    `).join("");
+
+    // Data dictionary
+    const dictBody = document.getElementById("data-dict-body");
+    dictBody.innerHTML = `<tr><th>Table</th><th>Grain</th><th>Key</th></tr>` +
+      visible.map(t => `<tr><td>${t.key}</td><td>${t.grain}</td><td>${t.pk}</td></tr>`).join("");
+
+    // Optional stage caption
+    const caption = document.getElementById("stage-caption");
+    if (stage.label) {
+      caption.textContent = `// showing tables covered through ${stage.label}`;
+      caption.style.display = "block";
+    }
+  }
 
   async function fetchTable(table, query = "") {
     const res = await fetch(SUPABASE_URL + table + query, {
@@ -571,6 +598,7 @@
     setTimeout(() => { btn.textContent = original; }, 1800);
   }
 
+  renderDataZone();
   loadCategories();
   loadProducts();
 </script>
