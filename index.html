@@ -175,8 +175,8 @@
   }
   .cat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(15,69,87,0.12); }
   .cat-icon {
-    width: 56px;
-    height: 56px;
+    width: 78px;
+    height: 78px;
     border-radius: 50%;
     background: var(--white);
     border: 1px solid var(--line);
@@ -185,7 +185,7 @@
     justify-content: center;
     margin-bottom: 14px;
   }
-  .cat-icon svg { width: 30px; height: 30px; }
+  .cat-icon svg { width: 46px; height: 46px; }
   .cat-card h3 { font-size: 1.05rem; color: var(--teal-deep); margin-bottom: 6px; }
   .cat-card span { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; opacity: 0.6; }
 
@@ -203,17 +203,18 @@
     min-width: 0;
   }
   .prod-swatch {
-    height: 120px;
+    height: 130px;
     background: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .prod-swatch svg { width: 52px; height: 52px; }
+  .prod-swatch svg { width: 72px; height: 72px; }
   .prod-body { padding: 16px 18px 20px; }
   .prod-body h4 { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
   .prod-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; color: var(--teal-deep); font-weight: 600; }
   .prod-cat { font-size: 0.78rem; opacity: 0.6; margin-top: 4px; }
+  .prod-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; opacity: 0.5; margin-top: 6px; }
 
   .loading-note, .empty-note {
     font-family: 'IBM Plex Mono', monospace;
@@ -650,6 +651,7 @@
             <h4>${p.productname || "Product"}</h4>
             <div class="prod-price">$${Number(p.productunitprice || 0).toFixed(2)}</div>
             <div class="prod-cat">${catName}</div>
+            <div class="prod-id">ID: ${p.productid ?? ""}</div>
           </div>
         </div>
       `;
