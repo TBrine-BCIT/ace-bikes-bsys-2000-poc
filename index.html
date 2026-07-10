@@ -483,7 +483,7 @@
       </table>
     </div>
 
-    <div class="data-card">
+    <div class="data-card" id="practice-files-card">
       <h3>4. Practice files (messier, real-world data)</h3>
       <p>Multi-location export files with the kind of quality issues you'll encounter in the field — mixed CSV/Excel, inconsistent formats, missing values.</p>
       <p style="opacity:0.6; font-size:0.82rem;">Available to your course section during the relevant module — ask your instructor for the current link.</p>
@@ -500,11 +500,18 @@
   const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og";
 
   // ---------- Stage system ----------
-  // Controls which tables show up in the Data & Learning Resources zone,
-  // so a chapter that hasn't introduced a table yet (e.g. line_items,
-  // taught as a discovery exercise in Ch3) doesn't spoil it on the site.
-  // Add new stages here as later chapters/courses need their own view.
-  // Link format: .../index.html?stage=KEY
+  // Controls what's visible in the Data & Learning Resources zone, so
+  // every URL in the textbook points to a view that matches exactly what
+  // that chapter has actually covered, no more. Two things are gated:
+  // tables (which ones show up in the URL list / data dictionary) and
+  // resources (features like practice files that don't exist yet for
+  // early chapters). Add a new stage whenever a chapter introduces
+  // something new. Link format: .../index.html?stage=KEY
+  //
+  // "full" is intentionally the exception: it unlocks everything,
+  // including things no chapter has linked to yet, and exists purely as
+  // an instructor/author debugging view. It is never referenced in the
+  // book itself, only specific chapter stages are.
   const TABLES = [
     { key: "customers",  grain: "1 row = 1 customer",              pk: "customerid" },
     { key: "products",   grain: "1 row = 1 product",               pk: "productid" },
@@ -514,15 +521,15 @@
   ];
 
   const STAGES = {
-    ch3:  { label: "Chapter 3", tables: ["customers", "products", "categories", "sales"] },
-    full: { label: null,        tables: TABLES.map(t => t.key) },
-    // future example:
-    // ch6: { label: "Chapter 6", tables: [...TABLES.map(t => t.key), "weather"] },
+    ch3:  { label: "Chapter 3", tables: ["customers", "products", "categories", "sales"], practiceFiles: false },
+    ch4:  { label: "Chapter 4", tables: TABLES.map(t => t.key),                            practiceFiles: false },
+    full: { label: null,        tables: TABLES.map(t => t.key),                            practiceFiles: true },
+    // future example, once Chapter 6 actually has files to serve:
+    // ch6: { label: "Chapter 6", tables: TABLES.map(t => t.key), practiceFiles: true },
   };
   // Default is intentionally the MINIMUM reveal level, not the maximum.
   // As more stages get added over time, a missing or mistyped ?stage=
-  // value should always fail toward showing LESS, never more. Chapters
-  // that want the fuller picture link to an explicit stage (e.g. ?stage=full).
+  // value should always fail toward showing LESS, never more.
   const DEFAULT_STAGE = "ch3";
 
   function getStage() {
@@ -534,6 +541,8 @@
     const stageKey = getStage();
     const stage = STAGES[stageKey];
     const visible = TABLES.filter(t => stage.tables.includes(t.key));
+
+    document.getElementById("practice-files-card").style.display = stage.practiceFiles ? "" : "none";
 
     // URL cards
     const urlList = document.getElementById("url-list");
