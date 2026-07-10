@@ -169,11 +169,23 @@
     background: var(--cream);
     border: 1px solid var(--line);
     border-radius: 10px;
-    padding: 22px 20px;
+    padding: 20px 20px 22px;
     transition: transform 0.2s, box-shadow 0.2s;
     min-width: 0;
   }
   .cat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(15,69,87,0.12); }
+  .cat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .cat-icon svg { width: 30px; height: 30px; }
   .cat-card h3 { font-size: 1.05rem; color: var(--teal-deep); margin-bottom: 6px; }
   .cat-card span { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; opacity: 0.6; }
 
@@ -191,17 +203,13 @@
     min-width: 0;
   }
   .prod-swatch {
-    height: 110px;
-    background: linear-gradient(135deg, var(--teal-bright), var(--teal-deep));
+    height: 120px;
+    background: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--white);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    opacity: 0.9;
   }
+  .prod-swatch svg { width: 52px; height: 52px; }
   .prod-body { padding: 16px 18px 20px; }
   .prod-body h4 { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
   .prod-price { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; color: var(--teal-deep); font-weight: 600; }
@@ -510,7 +518,11 @@
     // future example:
     // ch6: { label: "Chapter 6", tables: [...TABLES.map(t => t.key), "weather"] },
   };
-  const DEFAULT_STAGE = "full";
+  // Default is intentionally the MINIMUM reveal level, not the maximum.
+  // As more stages get added over time, a missing or mistyped ?stage=
+  // value should always fail toward showing LESS, never more. Chapters
+  // that want the fuller picture link to an explicit stage (e.g. ?stage=full).
+  const DEFAULT_STAGE = "ch3";
 
   function getStage() {
     const requested = new URLSearchParams(window.location.search).get("stage");
@@ -553,17 +565,66 @@
     return res.json();
   }
 
+  // ---------- Category icons ----------
+  // One hand-drawn line icon per category, in the same style as the logo's
+  // bicycle linework and the coastline dividers. Products borrow their
+  // category's icon rather than needing individual product photography.
+  const ICON_STROKE = 'fill="none" stroke="#0F4557" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"';
+  const ICONS = {
+    "Bikes": `<svg viewBox="0 0 100 100" ${ICON_STROKE}>
+      <circle cx="26" cy="70" r="16"/><circle cx="74" cy="70" r="16"/>
+      <path d="M26,70 L48,32 L74,70 M48,32 L38,70 M48,32 L60,20 L70,20"/>
+    </svg>`,
+    "Helmets & Safety": `<svg viewBox="0 0 100 100" ${ICON_STROKE}>
+      <path d="M18,66 Q18,24 50,24 Q82,24 82,66"/>
+      <path d="M14,66 Q50,80 86,66"/>
+      <path d="M32,64 L32,44 M50,66 L50,40 M68,64 L68,44"/>
+    </svg>`,
+    "Apparel": `<svg viewBox="0 0 100 100" ${ICON_STROKE}>
+      <path d="M38,22 L22,32 L30,46 L38,40 L38,80 L62,80 L62,40 L70,46 L78,32 L62,22 Q50,32 38,22 Z"/>
+    </svg>`,
+    "Accessories": `<svg viewBox="0 0 100 100" ${ICON_STROKE}>
+      <rect x="35" y="34" width="30" height="48" rx="10"/>
+      <rect x="43" y="18" width="14" height="18" rx="3"/>
+      <path d="M35,56 L65,56"/>
+    </svg>`,
+    "Tools & Maintenance": `<svg viewBox="0 0 100 100" ${ICON_STROKE}>
+      <path d="M24,24 a12,12 0 1,0 17,17 L70,70 M70,70 l8,8 M70,70 l8,-8"/>
+    </svg>`,
+    "Parts & Components": `<svg viewBox="0 0 100 100" ${ICON_STROKE}>
+      <circle cx="50" cy="50" r="20"/><circle cx="50" cy="50" r="7"/>
+      <path d="M50,22 L50,13 M50,78 L50,87 M22,50 L13,50 M78,50 L87,50 M32,32 L25,25 M68,32 L75,25 M32,68 L25,75 M68,68 L75,75"/>
+    </svg>`,
+  };
+  const FALLBACK_ICON = `<svg viewBox="0 0 100 100" ${ICON_STROKE}><circle cx="50" cy="50" r="28"/></svg>`;
+  function iconFor(categoryName) {
+    return ICONS[categoryName] || FALLBACK_ICON;
+  }
+
+  // Categories are fetched once and reused by both the category grid and
+  // the product grid (products only store a categoryid, so this gives us
+  // the name/icon lookup without a second round trip per product).
+  let categoriesPromise = null;
+  function getCategories() {
+    if (!categoriesPromise) categoriesPromise = fetchTable("categories", "?select=*");
+    return categoriesPromise;
+  }
+
   async function loadCategories() {
     const grid = document.getElementById("cat-grid");
     try {
-      const categories = await fetchTable("categories", "?select=*");
+      const categories = await getCategories();
       if (!categories.length) { grid.innerHTML = '<div class="empty-note">No categories found.</div>'; return; }
-      grid.innerHTML = categories.map(c => `
+      grid.innerHTML = categories.map(c => {
+        const name = c.categoryname || c.category1 || c.name || "Category";
+        return `
         <div class="cat-card">
-          <h3>${c.categoryname || c.category1 || c.name || "Category"}</h3>
+          <div class="cat-icon">${iconFor(name)}</div>
+          <h3>${name}</h3>
           <span>ID: ${c.categoryid ?? ""}</span>
         </div>
-      `).join("");
+      `;
+      }).join("");
     } catch (e) {
       grid.innerHTML = '<div class="empty-note">Categories unavailable right now — check your connection.</div>';
     }
@@ -572,18 +633,27 @@
   async function loadProducts() {
     const grid = document.getElementById("prod-grid");
     try {
-      const products = await fetchTable("products", "?select=*&limit=8");
+      const [categories, products] = await Promise.all([
+        getCategories(),
+        fetchTable("products", "?select=*&limit=8"),
+      ]);
+      const nameById = {};
+      categories.forEach(c => { nameById[c.categoryid] = c.categoryname || c.category1 || c.name; });
+
       if (!products.length) { grid.innerHTML = '<div class="empty-note">No products found.</div>'; return; }
-      grid.innerHTML = products.map(p => `
+      grid.innerHTML = products.map(p => {
+        const catName = nameById[p.categoryid] || "";
+        return `
         <div class="prod-card">
-          <div class="prod-swatch">${p.productsku || p.categoryid || "SKU"}</div>
+          <div class="prod-swatch">${iconFor(catName)}</div>
           <div class="prod-body">
             <h4>${p.productname || "Product"}</h4>
             <div class="prod-price">$${Number(p.productunitprice || 0).toFixed(2)}</div>
-            <div class="prod-cat">${p.productdescription || ""}</div>
+            <div class="prod-cat">${catName}</div>
           </div>
         </div>
-      `).join("");
+      `;
+      }).join("");
     } catch (e) {
       grid.innerHTML = '<div class="empty-note">Products unavailable right now — check your connection.</div>';
     }
