@@ -485,8 +485,8 @@
 
     <div class="data-card" id="practice-files-card">
       <h3>4. Practice files (messier, real-world data)</h3>
-      <p>Multi-location export files with the kind of quality issues you'll encounter in the field — mixed CSV/Excel, inconsistent formats, missing values.</p>
-      <p style="opacity:0.6; font-size:0.82rem;">Available to your course section during the relevant module — ask your instructor for the current link.</p>
+      <p>Export files from four Ace Bikes locations, deliberately kept close to what a real store's export looks like, missing values, inconsistent formats, and all.</p>
+      <div id="practice-files-list"><!-- populated by JS based on ?stage= --></div>
     </div>
   </div>
 </section>
@@ -498,6 +498,17 @@
 <script>
   const SUPABASE_URL = "https://kvuukeyzdeqltctywqdk.supabase.co/rest/v1/";
   const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2dXVrZXl6ZGVxbHRjdHl3cWRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3NDIwNzcsImV4cCI6MjA4ODMxODA3N30.-SFB_bk2iMeyKDYP8--XY-jB1gXwQ8II0OVf3bJX_og";
+  const STORAGE_BASE = "https://kvuukeyzdeqltctywqdk.supabase.co/storage/v1/object/public/tier2-practice-files/";
+
+  // Tier 2 practice files (real Ace Bikes order history, deliberately
+  // messy). Hosted in Supabase Storage, same project as the tables above,
+  // so data lives in one place rather than split across Supabase and GitHub.
+  const PRACTICE_FILES = [
+    { label: "Mountain View \u2014 Orders (2024)", file: "mountainview_orders_2024.csv" },
+    { label: "Crescent Beach \u2014 Orders (2024)", file: "crescentbeach_orders_2024.xlsx" },
+    { label: "Parkside \u2014 Orders (2024)", file: "parkside_orders_2024.csv" },
+    { label: "Park Royal \u2014 Orders (2025)", file: "parkroyal_orders_2025.xlsx" },
+  ];
 
   // ---------- Stage system ----------
   // Controls what's visible in the Data & Learning Resources zone, so
@@ -523,9 +534,8 @@
   const STAGES = {
     ch3:  { label: "Chapter 3", tables: ["customers", "products", "categories", "sales"], practiceFiles: false },
     ch4:  { label: "Chapter 4", tables: TABLES.map(t => t.key),                            practiceFiles: false },
+    ch6:  { label: "Chapter 6", tables: TABLES.map(t => t.key),                            practiceFiles: true },
     full: { label: null,        tables: TABLES.map(t => t.key),                            practiceFiles: true },
-    // future example, once Chapter 6 actually has files to serve:
-    // ch6: { label: "Chapter 6", tables: TABLES.map(t => t.key), practiceFiles: true },
   };
   // Default is intentionally the MINIMUM reveal level, not the maximum.
   // As more stages get added over time, a missing or mistyped ?stage=
@@ -543,6 +553,14 @@
     const visible = TABLES.filter(t => stage.tables.includes(t.key));
 
     document.getElementById("practice-files-card").style.display = stage.practiceFiles ? "" : "none";
+    if (stage.practiceFiles) {
+      document.getElementById("practice-files-list").innerHTML = PRACTICE_FILES.map(f => `
+        <div class="url-row">
+          <span class="url-label" style="width:auto; margin-right:10px;">${f.label}</span>
+          <a href="${STORAGE_BASE}${f.file}" style="font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--teal-bright);" download>${f.file}</a>
+        </div>
+      `).join("");
+    }
 
     // URL cards
     const urlList = document.getElementById("url-list");
